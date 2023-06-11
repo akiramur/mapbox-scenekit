@@ -1,0 +1,748 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		BD3C43342A3468E700040C2B /* MapboxSceneKit.h in Headers */ = {isa = PBXBuildFile; fileRef = BD3C43332A3468E700040C2B /* MapboxSceneKit.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		BD3C43412A34691A00040C2B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD3C43402A34691A00040C2B /* AppDelegate.swift */; };
+		BD3C43432A34691A00040C2B /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD3C43422A34691A00040C2B /* SceneDelegate.swift */; };
+		BD3C43482A34691A00040C2B /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = BD3C43462A34691A00040C2B /* Main.storyboard */; };
+		BD3C434A2A34691C00040C2B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BD3C43492A34691C00040C2B /* Assets.xcassets */; };
+		BD3C434D2A34691C00040C2B /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = BD3C434B2A34691C00040C2B /* LaunchScreen.storyboard */; };
+		BD3C43762A346C7800040C2B /* CGExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD3C43612A346C7800040C2B /* CGExtensions.swift */; };
+		BD3C43772A346C7800040C2B /* SCNExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD3C43622A346C7800040C2B /* SCNExtensions.swift */; };
+		BD3C43782A346C7800040C2B /* SCNProgramExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD3C43632A346C7800040C2B /* SCNProgramExtensions.swift */; };
+		BD3C43792A346C7800040C2B /* PolylineShader.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD3C43652A346C7800040C2B /* PolylineShader.swift */; };
+		BD3C437A2A346C7800040C2B /* PolylineCylinder.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD3C43662A346C7800040C2B /* PolylineCylinder.swift */; };
+		BD3C437B2A346C7800040C2B /* PolylineNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD3C43672A346C7800040C2B /* PolylineNode.swift */; };
+		BD3C437C2A346C7800040C2B /* PolylineRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD3C43682A346C7800040C2B /* PolylineRenderer.swift */; };
+		BD3C437D2A346C7800040C2B /* unlit-line.metal in Sources */ = {isa = PBXBuildFile; fileRef = BD3C436A2A346C7800040C2B /* unlit-line.metal */; };
+		BD3C437E2A346C7800040C2B /* BezierSpline3D.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD3C436B2A346C7800040C2B /* BezierSpline3D.swift */; };
+		BD3C437F2A346C7800040C2B /* TerrainNodeExtension+Routes.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD3C436C2A346C7800040C2B /* TerrainNodeExtension+Routes.swift */; };
+		BD3C43802A346C7800040C2B /* HTTPRequestOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD3C436E2A346C7800040C2B /* HTTPRequestOperation.swift */; };
+		BD3C43812A346C7800040C2B /* ImageBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD3C436F2A346C7800040C2B /* ImageBuilder.swift */; };
+		BD3C43822A346C7800040C2B /* MapboxHTTPAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD3C43702A346C7800040C2B /* MapboxHTTPAPI.swift */; };
+		BD3C43832A346C7800040C2B /* AsyncOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD3C43712A346C7800040C2B /* AsyncOperation.swift */; };
+		BD3C43842A346C7800040C2B /* Math.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD3C43722A346C7800040C2B /* Math.swift */; };
+		BD3C43852A346C7800040C2B /* MapboxImageAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD3C43732A346C7800040C2B /* MapboxImageAPI.swift */; };
+		BD3C43862A346C7800040C2B /* StaticConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD3C43742A346C7800040C2B /* StaticConstants.swift */; };
+		BD3C43872A346C7800040C2B /* TerrainNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD3C43752A346C7800040C2B /* TerrainNode.swift */; };
+		BD3C43912A346DC300040C2B /* DemoExtrusionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD3C43882A346DC300040C2B /* DemoExtrusionViewController.swift */; };
+		BD3C43922A346DC300040C2B /* DemoPlacementViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD3C43892A346DC300040C2B /* DemoPlacementViewController.swift */; };
+		BD3C43932A346DC300040C2B /* SCNExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD3C438A2A346DC300040C2B /* SCNExtensions.swift */; };
+		BD3C43942A346DC300040C2B /* TerrainDemoScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD3C438B2A346DC300040C2B /* TerrainDemoScene.swift */; };
+		BD3C43952A346DC300040C2B /* DemoStyleViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD3C438C2A346DC300040C2B /* DemoStyleViewController.swift */; };
+		BD3C43962A346DC300040C2B /* FocusSquare.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD3C438D2A346DC300040C2B /* FocusSquare.swift */; };
+		BD3C43972A346DC300040C2B /* DemoARViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD3C438E2A346DC300040C2B /* DemoARViewController.swift */; };
+		BD3C43982A346DC300040C2B /* ProgressCompositor.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD3C438F2A346DC300040C2B /* ProgressCompositor.swift */; };
+		BD3C43992A346DC300040C2B /* DemoHeightmapViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD3C43902A346DC300040C2B /* DemoHeightmapViewController.swift */; };
+		BD3C439F2A346F4800040C2B /* MapboxMaps in Frameworks */ = {isa = PBXBuildFile; productRef = BD3C439E2A346F4800040C2B /* MapboxMaps */; };
+		BD3C43A12A346FFC00040C2B /* MapboxSceneKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BD3C43302A3468E700040C2B /* MapboxSceneKit.framework */; };
+		BD3C43A22A346FFC00040C2B /* MapboxSceneKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = BD3C43302A3468E700040C2B /* MapboxSceneKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		BD3C43AD2A35681F00040C2B /* MapboxMobileEvents in Frameworks */ = {isa = PBXBuildFile; productRef = BD3C43AC2A35681F00040C2B /* MapboxMobileEvents */; };
+		BD3C43AF2A356BDD00040C2B /* MapboxMobileEvents in Frameworks */ = {isa = PBXBuildFile; productRef = BD3C43AE2A356BDD00040C2B /* MapboxMobileEvents */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		BD3C43A32A346FFC00040C2B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BD3C43272A3468E700040C2B /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = BD3C432F2A3468E700040C2B;
+			remoteInfo = MapboxSceneKit;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		BD3C43A52A346FFC00040C2B /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				BD3C43A22A346FFC00040C2B /* MapboxSceneKit.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		BD3C43302A3468E700040C2B /* MapboxSceneKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = MapboxSceneKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		BD3C43332A3468E700040C2B /* MapboxSceneKit.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MapboxSceneKit.h; sourceTree = "<group>"; };
+		BD3C433E2A34691A00040C2B /* Examples.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Examples.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		BD3C43402A34691A00040C2B /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		BD3C43422A34691A00040C2B /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
+		BD3C43472A34691A00040C2B /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		BD3C43492A34691C00040C2B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		BD3C434C2A34691C00040C2B /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		BD3C434E2A34691C00040C2B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		BD3C43612A346C7800040C2B /* CGExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CGExtensions.swift; sourceTree = "<group>"; };
+		BD3C43622A346C7800040C2B /* SCNExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SCNExtensions.swift; sourceTree = "<group>"; };
+		BD3C43632A346C7800040C2B /* SCNProgramExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SCNProgramExtensions.swift; sourceTree = "<group>"; };
+		BD3C43652A346C7800040C2B /* PolylineShader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PolylineShader.swift; sourceTree = "<group>"; };
+		BD3C43662A346C7800040C2B /* PolylineCylinder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PolylineCylinder.swift; sourceTree = "<group>"; };
+		BD3C43672A346C7800040C2B /* PolylineNode.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PolylineNode.swift; sourceTree = "<group>"; };
+		BD3C43682A346C7800040C2B /* PolylineRenderer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PolylineRenderer.swift; sourceTree = "<group>"; };
+		BD3C436A2A346C7800040C2B /* unlit-line.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; path = "unlit-line.metal"; sourceTree = "<group>"; };
+		BD3C436B2A346C7800040C2B /* BezierSpline3D.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BezierSpline3D.swift; sourceTree = "<group>"; };
+		BD3C436C2A346C7800040C2B /* TerrainNodeExtension+Routes.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "TerrainNodeExtension+Routes.swift"; sourceTree = "<group>"; };
+		BD3C436E2A346C7800040C2B /* HTTPRequestOperation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HTTPRequestOperation.swift; sourceTree = "<group>"; };
+		BD3C436F2A346C7800040C2B /* ImageBuilder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageBuilder.swift; sourceTree = "<group>"; };
+		BD3C43702A346C7800040C2B /* MapboxHTTPAPI.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MapboxHTTPAPI.swift; sourceTree = "<group>"; };
+		BD3C43712A346C7800040C2B /* AsyncOperation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AsyncOperation.swift; sourceTree = "<group>"; };
+		BD3C43722A346C7800040C2B /* Math.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Math.swift; sourceTree = "<group>"; };
+		BD3C43732A346C7800040C2B /* MapboxImageAPI.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MapboxImageAPI.swift; sourceTree = "<group>"; };
+		BD3C43742A346C7800040C2B /* StaticConstants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StaticConstants.swift; sourceTree = "<group>"; };
+		BD3C43752A346C7800040C2B /* TerrainNode.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TerrainNode.swift; sourceTree = "<group>"; };
+		BD3C43882A346DC300040C2B /* DemoExtrusionViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DemoExtrusionViewController.swift; sourceTree = "<group>"; };
+		BD3C43892A346DC300040C2B /* DemoPlacementViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DemoPlacementViewController.swift; sourceTree = "<group>"; };
+		BD3C438A2A346DC300040C2B /* SCNExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SCNExtensions.swift; sourceTree = "<group>"; };
+		BD3C438B2A346DC300040C2B /* TerrainDemoScene.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TerrainDemoScene.swift; sourceTree = "<group>"; };
+		BD3C438C2A346DC300040C2B /* DemoStyleViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DemoStyleViewController.swift; sourceTree = "<group>"; };
+		BD3C438D2A346DC300040C2B /* FocusSquare.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FocusSquare.swift; sourceTree = "<group>"; };
+		BD3C438E2A346DC300040C2B /* DemoARViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DemoARViewController.swift; sourceTree = "<group>"; };
+		BD3C438F2A346DC300040C2B /* ProgressCompositor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProgressCompositor.swift; sourceTree = "<group>"; };
+		BD3C43902A346DC300040C2B /* DemoHeightmapViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DemoHeightmapViewController.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		BD3C432D2A3468E700040C2B /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BD3C43AD2A35681F00040C2B /* MapboxMobileEvents in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		BD3C433B2A34691A00040C2B /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BD3C439F2A346F4800040C2B /* MapboxMaps in Frameworks */,
+				BD3C43A12A346FFC00040C2B /* MapboxSceneKit.framework in Frameworks */,
+				BD3C43AF2A356BDD00040C2B /* MapboxMobileEvents in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		BD3C43262A3468E700040C2B = {
+			isa = PBXGroup;
+			children = (
+				BD3C433F2A34691A00040C2B /* Examples */,
+				BD3C43322A3468E700040C2B /* MapboxSceneKit */,
+				BD3C43312A3468E700040C2B /* Products */,
+				BD3C43A02A346FFC00040C2B /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		BD3C43312A3468E700040C2B /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				BD3C43302A3468E700040C2B /* MapboxSceneKit.framework */,
+				BD3C433E2A34691A00040C2B /* Examples.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		BD3C43322A3468E700040C2B /* MapboxSceneKit */ = {
+			isa = PBXGroup;
+			children = (
+				BD3C43602A346C7800040C2B /* Extensions */,
+				BD3C43732A346C7800040C2B /* MapboxImageAPI.swift */,
+				BD3C43332A3468E700040C2B /* MapboxSceneKit.h */,
+				BD3C43722A346C7800040C2B /* Math.swift */,
+				BD3C43642A346C7800040C2B /* Routes */,
+				BD3C43742A346C7800040C2B /* StaticConstants.swift */,
+				BD3C43752A346C7800040C2B /* TerrainNode.swift */,
+				BD3C436D2A346C7800040C2B /* Tile Fetching */,
+			);
+			path = MapboxSceneKit;
+			sourceTree = "<group>";
+		};
+		BD3C433F2A34691A00040C2B /* Examples */ = {
+			isa = PBXGroup;
+			children = (
+				BD3C43402A34691A00040C2B /* AppDelegate.swift */,
+				BD3C43492A34691C00040C2B /* Assets.xcassets */,
+				BD3C438E2A346DC300040C2B /* DemoARViewController.swift */,
+				BD3C43882A346DC300040C2B /* DemoExtrusionViewController.swift */,
+				BD3C43902A346DC300040C2B /* DemoHeightmapViewController.swift */,
+				BD3C43892A346DC300040C2B /* DemoPlacementViewController.swift */,
+				BD3C438C2A346DC300040C2B /* DemoStyleViewController.swift */,
+				BD3C438D2A346DC300040C2B /* FocusSquare.swift */,
+				BD3C434E2A34691C00040C2B /* Info.plist */,
+				BD3C434B2A34691C00040C2B /* LaunchScreen.storyboard */,
+				BD3C43462A34691A00040C2B /* Main.storyboard */,
+				BD3C438F2A346DC300040C2B /* ProgressCompositor.swift */,
+				BD3C43422A34691A00040C2B /* SceneDelegate.swift */,
+				BD3C438A2A346DC300040C2B /* SCNExtensions.swift */,
+				BD3C438B2A346DC300040C2B /* TerrainDemoScene.swift */,
+			);
+			path = Examples;
+			sourceTree = "<group>";
+		};
+		BD3C43602A346C7800040C2B /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				BD3C43612A346C7800040C2B /* CGExtensions.swift */,
+				BD3C43622A346C7800040C2B /* SCNExtensions.swift */,
+				BD3C43632A346C7800040C2B /* SCNProgramExtensions.swift */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
+		BD3C43642A346C7800040C2B /* Routes */ = {
+			isa = PBXGroup;
+			children = (
+				BD3C43652A346C7800040C2B /* PolylineShader.swift */,
+				BD3C43662A346C7800040C2B /* PolylineCylinder.swift */,
+				BD3C43672A346C7800040C2B /* PolylineNode.swift */,
+				BD3C43682A346C7800040C2B /* PolylineRenderer.swift */,
+				BD3C43692A346C7800040C2B /* Shaders */,
+				BD3C436B2A346C7800040C2B /* BezierSpline3D.swift */,
+				BD3C436C2A346C7800040C2B /* TerrainNodeExtension+Routes.swift */,
+			);
+			path = Routes;
+			sourceTree = "<group>";
+		};
+		BD3C43692A346C7800040C2B /* Shaders */ = {
+			isa = PBXGroup;
+			children = (
+				BD3C436A2A346C7800040C2B /* unlit-line.metal */,
+			);
+			path = Shaders;
+			sourceTree = "<group>";
+		};
+		BD3C436D2A346C7800040C2B /* Tile Fetching */ = {
+			isa = PBXGroup;
+			children = (
+				BD3C436E2A346C7800040C2B /* HTTPRequestOperation.swift */,
+				BD3C436F2A346C7800040C2B /* ImageBuilder.swift */,
+				BD3C43702A346C7800040C2B /* MapboxHTTPAPI.swift */,
+				BD3C43712A346C7800040C2B /* AsyncOperation.swift */,
+			);
+			path = "Tile Fetching";
+			sourceTree = "<group>";
+		};
+		BD3C43A02A346FFC00040C2B /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		BD3C432B2A3468E700040C2B /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BD3C43342A3468E700040C2B /* MapboxSceneKit.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		BD3C432F2A3468E700040C2B /* MapboxSceneKit */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = BD3C43372A3468E700040C2B /* Build configuration list for PBXNativeTarget "MapboxSceneKit" */;
+			buildPhases = (
+				BD3C432B2A3468E700040C2B /* Headers */,
+				BD3C432C2A3468E700040C2B /* Sources */,
+				BD3C432D2A3468E700040C2B /* Frameworks */,
+				BD3C432E2A3468E700040C2B /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = MapboxSceneKit;
+			packageProductDependencies = (
+				BD3C43AC2A35681F00040C2B /* MapboxMobileEvents */,
+			);
+			productName = MapboxSceneKit;
+			productReference = BD3C43302A3468E700040C2B /* MapboxSceneKit.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+		BD3C433D2A34691A00040C2B /* Examples */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = BD3C43512A34691C00040C2B /* Build configuration list for PBXNativeTarget "Examples" */;
+			buildPhases = (
+				BD3C433A2A34691A00040C2B /* Sources */,
+				BD3C433B2A34691A00040C2B /* Frameworks */,
+				BD3C433C2A34691A00040C2B /* Resources */,
+				BD3C43A52A346FFC00040C2B /* Embed Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				BD3C43A42A346FFC00040C2B /* PBXTargetDependency */,
+			);
+			name = Examples;
+			packageProductDependencies = (
+				BD3C439E2A346F4800040C2B /* MapboxMaps */,
+				BD3C43AE2A356BDD00040C2B /* MapboxMobileEvents */,
+			);
+			productName = Examples;
+			productReference = BD3C433E2A34691A00040C2B /* Examples.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		BD3C43272A3468E700040C2B /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1430;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					BD3C432F2A3468E700040C2B = {
+						CreatedOnToolsVersion = 14.3.1;
+						LastSwiftMigration = 1430;
+					};
+					BD3C433D2A34691A00040C2B = {
+						CreatedOnToolsVersion = 14.3.1;
+					};
+				};
+			};
+			buildConfigurationList = BD3C432A2A3468E700040C2B /* Build configuration list for PBXProject "MapboxSceneKit" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = BD3C43262A3468E700040C2B;
+			packageReferences = (
+				BD3C439D2A346F4800040C2B /* XCRemoteSwiftPackageReference "mapbox-maps-ios" */,
+				BD3C43AB2A35681F00040C2B /* XCRemoteSwiftPackageReference "mapbox-events-ios" */,
+			);
+			productRefGroup = BD3C43312A3468E700040C2B /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				BD3C432F2A3468E700040C2B /* MapboxSceneKit */,
+				BD3C433D2A34691A00040C2B /* Examples */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		BD3C432E2A3468E700040C2B /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		BD3C433C2A34691A00040C2B /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BD3C434D2A34691C00040C2B /* LaunchScreen.storyboard in Resources */,
+				BD3C434A2A34691C00040C2B /* Assets.xcassets in Resources */,
+				BD3C43482A34691A00040C2B /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		BD3C432C2A3468E700040C2B /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BD3C43782A346C7800040C2B /* SCNProgramExtensions.swift in Sources */,
+				BD3C437E2A346C7800040C2B /* BezierSpline3D.swift in Sources */,
+				BD3C43772A346C7800040C2B /* SCNExtensions.swift in Sources */,
+				BD3C43852A346C7800040C2B /* MapboxImageAPI.swift in Sources */,
+				BD3C437D2A346C7800040C2B /* unlit-line.metal in Sources */,
+				BD3C437C2A346C7800040C2B /* PolylineRenderer.swift in Sources */,
+				BD3C43822A346C7800040C2B /* MapboxHTTPAPI.swift in Sources */,
+				BD3C43832A346C7800040C2B /* AsyncOperation.swift in Sources */,
+				BD3C437F2A346C7800040C2B /* TerrainNodeExtension+Routes.swift in Sources */,
+				BD3C43802A346C7800040C2B /* HTTPRequestOperation.swift in Sources */,
+				BD3C43812A346C7800040C2B /* ImageBuilder.swift in Sources */,
+				BD3C43862A346C7800040C2B /* StaticConstants.swift in Sources */,
+				BD3C43792A346C7800040C2B /* PolylineShader.swift in Sources */,
+				BD3C43762A346C7800040C2B /* CGExtensions.swift in Sources */,
+				BD3C437A2A346C7800040C2B /* PolylineCylinder.swift in Sources */,
+				BD3C437B2A346C7800040C2B /* PolylineNode.swift in Sources */,
+				BD3C43842A346C7800040C2B /* Math.swift in Sources */,
+				BD3C43872A346C7800040C2B /* TerrainNode.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		BD3C433A2A34691A00040C2B /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BD3C43412A34691A00040C2B /* AppDelegate.swift in Sources */,
+				BD3C43432A34691A00040C2B /* SceneDelegate.swift in Sources */,
+				BD3C43912A346DC300040C2B /* DemoExtrusionViewController.swift in Sources */,
+				BD3C43942A346DC300040C2B /* TerrainDemoScene.swift in Sources */,
+				BD3C43952A346DC300040C2B /* DemoStyleViewController.swift in Sources */,
+				BD3C43962A346DC300040C2B /* FocusSquare.swift in Sources */,
+				BD3C43922A346DC300040C2B /* DemoPlacementViewController.swift in Sources */,
+				BD3C43982A346DC300040C2B /* ProgressCompositor.swift in Sources */,
+				BD3C43932A346DC300040C2B /* SCNExtensions.swift in Sources */,
+				BD3C43972A346DC300040C2B /* DemoARViewController.swift in Sources */,
+				BD3C43992A346DC300040C2B /* DemoHeightmapViewController.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		BD3C43A42A346FFC00040C2B /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = BD3C432F2A3468E700040C2B /* MapboxSceneKit */;
+			targetProxy = BD3C43A32A346FFC00040C2B /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		BD3C43462A34691A00040C2B /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				BD3C43472A34691A00040C2B /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		BD3C434B2A34691C00040C2B /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				BD3C434C2A34691C00040C2B /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		BD3C43352A3468E700040C2B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
+		BD3C43362A3468E700040C2B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				VALIDATE_PRODUCT = YES;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
+		BD3C43382A3468E700040C2B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = "";
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_MODULE_VERIFIER = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
+				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu11 gnu++20";
+				PRODUCT_BUNDLE_IDENTIFIER = com.mapbox.mapboxscenekit;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		BD3C43392A3468E700040C2B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = "";
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_MODULE_VERIFIER = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
+				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu11 gnu++20";
+				PRODUCT_BUNDLE_IDENTIFIER = com.mapbox.mapboxscenekit;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		BD3C434F2A34691C00040C2B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Examples/Info.plist;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
+				INFOPLIST_KEY_UIMainStoryboardFile = Main;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.mapbox.scenekit.Examples;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		BD3C43502A34691C00040C2B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Examples/Info.plist;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
+				INFOPLIST_KEY_UIMainStoryboardFile = Main;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.mapbox.scenekit.Examples;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		BD3C432A2A3468E700040C2B /* Build configuration list for PBXProject "MapboxSceneKit" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BD3C43352A3468E700040C2B /* Debug */,
+				BD3C43362A3468E700040C2B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		BD3C43372A3468E700040C2B /* Build configuration list for PBXNativeTarget "MapboxSceneKit" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BD3C43382A3468E700040C2B /* Debug */,
+				BD3C43392A3468E700040C2B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		BD3C43512A34691C00040C2B /* Build configuration list for PBXNativeTarget "Examples" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BD3C434F2A34691C00040C2B /* Debug */,
+				BD3C43502A34691C00040C2B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		BD3C439D2A346F4800040C2B /* XCRemoteSwiftPackageReference "mapbox-maps-ios" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/mapbox/mapbox-maps-ios.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 10.13.1;
+			};
+		};
+		BD3C43AB2A35681F00040C2B /* XCRemoteSwiftPackageReference "mapbox-events-ios" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/mapbox/mapbox-events-ios.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.10;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		BD3C439E2A346F4800040C2B /* MapboxMaps */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = BD3C439D2A346F4800040C2B /* XCRemoteSwiftPackageReference "mapbox-maps-ios" */;
+			productName = MapboxMaps;
+		};
+		BD3C43AC2A35681F00040C2B /* MapboxMobileEvents */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = BD3C43AB2A35681F00040C2B /* XCRemoteSwiftPackageReference "mapbox-events-ios" */;
+			productName = MapboxMobileEvents;
+		};
+		BD3C43AE2A356BDD00040C2B /* MapboxMobileEvents */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = BD3C43AB2A35681F00040C2B /* XCRemoteSwiftPackageReference "mapbox-events-ios" */;
+			productName = MapboxMobileEvents;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = BD3C43272A3468E700040C2B /* Project object */;
+}
