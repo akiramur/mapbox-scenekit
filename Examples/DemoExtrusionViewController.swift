@@ -6,14 +6,24 @@ import MapboxSceneKit
 
 class DemoExtrusionViewController: UIViewController {
     @IBOutlet private weak var sceneView: SCNView?
-    
+
     private var mapView: MapView!
     private var terrainDemoScene: TerrainDemoScene?
     private var terrainNode: TerrainNode?
+
+    private var progressHandler: ProgressCompositor!
+    private var fetchTask: Task<Void, Error>?
     
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
-
+        
+        //Progress handler is a helper to aggregate progress through the three stages causing user wait: fetching heightmap images, calculating/rendering the heightmap, fetching the texture images
+        progressHandler = ProgressCompositor(updater: { [weak self] progress in
+            //self?.progressView?.progress = progress
+            //self?.progressView?.isHidden = false
+        }, completer: { [weak self] in
+            //self?.progressView?.isHidden = true
+        })
     }
     
     override func viewDidLoad() {
@@ -103,7 +113,7 @@ class DemoExtrusionViewController: UIViewController {
             terrainDemoScene?.cameraNode.position = SCNVector3Make(boundingBox.max.x * 2, 2000, boundingBox.max.z * 2.0)
             
             terrainDemoScene?.cameraNode.look(at: terrainNode.position)
-            
+            #if false
             terrainNode.fetchTerrainAndTexture(minWallHeight: 50.0, multiplier: 1.5, enableDynamicShadows: true, textureStyle: "mapbox/satellite-v9") { error in
                 if let fetchError = error {
                     print("Texture load failed: \(fetchError.localizedDescription)")
@@ -120,6 +130,60 @@ class DemoExtrusionViewController: UIViewController {
                     self?.terrainNode?.geometry?.materials[4].diffuse.contents = image
                 }
             }
+            #endif
+            
+            let terrainFetcherHandler = progressHandler.registerForProgress()
+            let terrainRendererHandler = progressHandler.registerForProgress()
+            let textureFetchHandler = progressHandler.registerForProgress()
+            
+            fetchTask?.cancel()
+            fetchTask = Task {
+                await loadTerrain(
+                    terrainNode: terrainNode,
+                    terrainFetcherHandler: terrainFetcherHandler,
+                    terrainRendererHandler: terrainRendererHandler
+                )
+
+                await loadTexture(
+                    style: "mapbox/satellite-v9",
+                    terrainNode: terrainNode,
+                    textureFetchHandler: textureFetchHandler
+                )
+            } // Task
+        }
+    }
+    
+    private func loadTerrain(
+        terrainNode: TerrainNode,
+        terrainFetcherHandler: Int,
+        terrainRendererHandler: Int
+    ) async {
+        do {
+            try await terrainNode.fetchTerrain(
+                minWallHeight: 50.0,
+                multiplier: 1.5,
+                enableDynamicShadows: false,
+                heightProgress: nil,
+                rendererProgress: nil
+            )
+        }
+        catch {
+            print("error: \(error)")
+        }
+    }
+    
+    private func loadTexture(
+            style: String,
+            terrainNode: TerrainNode,
+            textureFetchHandler: Int
+    ) async {
+        do {
+            _ = try await terrainNode.fetchTexture(
+                textureStyle: style,
+                textureProgress: nil)
+        }
+        catch {
+            print("Texture load failed: \(error.localizedDescription)")
         }
     }
 }

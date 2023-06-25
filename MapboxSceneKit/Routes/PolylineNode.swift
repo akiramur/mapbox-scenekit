@@ -10,7 +10,6 @@ import Foundation
 import SceneKit
 
 // MARK: - Constructors
-@objc(MBPolylineNode)
 public class PolylineNode: SCNNode {
 
     private var lineRenderer: PolylineRenderer
@@ -39,7 +38,6 @@ public class PolylineNode: SCNNode {
     ///   - positions: The list of SCNVector3 positions. Drawn through each position from 0...n
     ///   - radius: The width of the line in local space
     ///   - color: The color of the line
-    @objc
     public convenience init(positions: [SCNVector3], radius: CGFloat, color: UIColor ) {
 
         //define the polyline's curves from the inputs
@@ -59,7 +57,6 @@ public class PolylineNode: SCNNode {
     ///   - startColor: The color of the initial point of the line. Linearly interpolated from start to end.
     ///   - endColor: The color of the final point of the line. Linearly interpolated from start to end.
     @available(iOS 10.0, *)
-    @objc
     public convenience init(positions: [SCNVector3], startRadius: CGFloat, endRadius: CGFloat,
                             startColor: UIColor, endColor: UIColor){
 
@@ -78,7 +75,6 @@ public class PolylineNode: SCNNode {
     ///   - radii: The list of radii, distributed evenly along the line
     ///   - colors: The list of colors, distributed evenly along the line
     @available(iOS 10.0, *)
-    @objc
     public convenience init(positions: [SCNVector3], radii: [CGFloat], colors: [UIColor]) {
 
         let pos = BezierSpline3D(curvePoints: positions)

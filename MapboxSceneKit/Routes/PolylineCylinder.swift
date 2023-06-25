@@ -69,7 +69,7 @@ internal class PolylineCylinder: PolylineRenderer {
     ///   - radius: Radius of the cylinder.
     ///   - color: Color of the cylinder.
     /// - Returns: Fully configured and projected cylinder to the given terrain node.
-    @objc private func cylinder(from startPoint: SCNVector3, to endPoint: SCNVector3,
+    private func cylinder(from startPoint: SCNVector3, to endPoint: SCNVector3,
                                 radius: CGFloat, color: UIColor) -> SCNNode {
         let node = SCNNode()
         let middleVector = SCNVector3(x: endPoint.x - startPoint.x,

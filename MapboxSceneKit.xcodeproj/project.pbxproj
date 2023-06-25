@@ -23,10 +23,8 @@
 		BD3C437D2A346C7800040C2B /* unlit-line.metal in Sources */ = {isa = PBXBuildFile; fileRef = BD3C436A2A346C7800040C2B /* unlit-line.metal */; };
 		BD3C437E2A346C7800040C2B /* BezierSpline3D.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD3C436B2A346C7800040C2B /* BezierSpline3D.swift */; };
 		BD3C437F2A346C7800040C2B /* TerrainNodeExtension+Routes.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD3C436C2A346C7800040C2B /* TerrainNodeExtension+Routes.swift */; };
-		BD3C43802A346C7800040C2B /* HTTPRequestOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD3C436E2A346C7800040C2B /* HTTPRequestOperation.swift */; };
 		BD3C43812A346C7800040C2B /* ImageBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD3C436F2A346C7800040C2B /* ImageBuilder.swift */; };
 		BD3C43822A346C7800040C2B /* MapboxHTTPAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD3C43702A346C7800040C2B /* MapboxHTTPAPI.swift */; };
-		BD3C43832A346C7800040C2B /* AsyncOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD3C43712A346C7800040C2B /* AsyncOperation.swift */; };
 		BD3C43842A346C7800040C2B /* Math.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD3C43722A346C7800040C2B /* Math.swift */; };
 		BD3C43852A346C7800040C2B /* MapboxImageAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD3C43732A346C7800040C2B /* MapboxImageAPI.swift */; };
 		BD3C43862A346C7800040C2B /* StaticConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD3C43742A346C7800040C2B /* StaticConstants.swift */; };
@@ -45,6 +43,7 @@
 		BD3C43A22A346FFC00040C2B /* MapboxSceneKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = BD3C43302A3468E700040C2B /* MapboxSceneKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		BD3C43AD2A35681F00040C2B /* MapboxMobileEvents in Frameworks */ = {isa = PBXBuildFile; productRef = BD3C43AC2A35681F00040C2B /* MapboxMobileEvents */; };
 		BD3C43AF2A356BDD00040C2B /* MapboxMobileEvents in Frameworks */ = {isa = PBXBuildFile; productRef = BD3C43AE2A356BDD00040C2B /* MapboxMobileEvents */; };
+		BDFAFE302A4802A200D8B723 /* HttpApiClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDFAFE2F2A4802A200D8B723 /* HttpApiClient.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -91,10 +90,8 @@
 		BD3C436A2A346C7800040C2B /* unlit-line.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; path = "unlit-line.metal"; sourceTree = "<group>"; };
 		BD3C436B2A346C7800040C2B /* BezierSpline3D.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BezierSpline3D.swift; sourceTree = "<group>"; };
 		BD3C436C2A346C7800040C2B /* TerrainNodeExtension+Routes.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "TerrainNodeExtension+Routes.swift"; sourceTree = "<group>"; };
-		BD3C436E2A346C7800040C2B /* HTTPRequestOperation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HTTPRequestOperation.swift; sourceTree = "<group>"; };
 		BD3C436F2A346C7800040C2B /* ImageBuilder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageBuilder.swift; sourceTree = "<group>"; };
 		BD3C43702A346C7800040C2B /* MapboxHTTPAPI.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MapboxHTTPAPI.swift; sourceTree = "<group>"; };
-		BD3C43712A346C7800040C2B /* AsyncOperation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AsyncOperation.swift; sourceTree = "<group>"; };
 		BD3C43722A346C7800040C2B /* Math.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Math.swift; sourceTree = "<group>"; };
 		BD3C43732A346C7800040C2B /* MapboxImageAPI.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MapboxImageAPI.swift; sourceTree = "<group>"; };
 		BD3C43742A346C7800040C2B /* StaticConstants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StaticConstants.swift; sourceTree = "<group>"; };
@@ -108,6 +105,7 @@
 		BD3C438E2A346DC300040C2B /* DemoARViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DemoARViewController.swift; sourceTree = "<group>"; };
 		BD3C438F2A346DC300040C2B /* ProgressCompositor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProgressCompositor.swift; sourceTree = "<group>"; };
 		BD3C43902A346DC300040C2B /* DemoHeightmapViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DemoHeightmapViewController.swift; sourceTree = "<group>"; };
+		BDFAFE2F2A4802A200D8B723 /* HttpApiClient.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HttpApiClient.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -223,10 +221,9 @@
 		BD3C436D2A346C7800040C2B /* Tile Fetching */ = {
 			isa = PBXGroup;
 			children = (
-				BD3C436E2A346C7800040C2B /* HTTPRequestOperation.swift */,
+				BDFAFE2F2A4802A200D8B723 /* HttpApiClient.swift */,
 				BD3C436F2A346C7800040C2B /* ImageBuilder.swift */,
 				BD3C43702A346C7800040C2B /* MapboxHTTPAPI.swift */,
-				BD3C43712A346C7800040C2B /* AsyncOperation.swift */,
 			);
 			path = "Tile Fetching";
 			sourceTree = "<group>";
@@ -365,14 +362,13 @@
 			files = (
 				BD3C43782A346C7800040C2B /* SCNProgramExtensions.swift in Sources */,
 				BD3C437E2A346C7800040C2B /* BezierSpline3D.swift in Sources */,
+				BDFAFE302A4802A200D8B723 /* HttpApiClient.swift in Sources */,
 				BD3C43772A346C7800040C2B /* SCNExtensions.swift in Sources */,
 				BD3C43852A346C7800040C2B /* MapboxImageAPI.swift in Sources */,
 				BD3C437D2A346C7800040C2B /* unlit-line.metal in Sources */,
 				BD3C437C2A346C7800040C2B /* PolylineRenderer.swift in Sources */,
 				BD3C43822A346C7800040C2B /* MapboxHTTPAPI.swift in Sources */,
-				BD3C43832A346C7800040C2B /* AsyncOperation.swift in Sources */,
 				BD3C437F2A346C7800040C2B /* TerrainNodeExtension+Routes.swift in Sources */,
-				BD3C43802A346C7800040C2B /* HTTPRequestOperation.swift in Sources */,
 				BD3C43812A346C7800040C2B /* ImageBuilder.swift in Sources */,
 				BD3C43862A346C7800040C2B /* StaticConstants.swift in Sources */,
 				BD3C43792A346C7800040C2B /* PolylineShader.swift in Sources */,

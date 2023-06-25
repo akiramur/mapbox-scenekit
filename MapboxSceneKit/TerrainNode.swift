@@ -6,12 +6,15 @@ import CoreLocation
  The `TerrainNode` object represents the easiest way to generate terrain in SceneKit (if you prefer a custom solution, see the methods on `MapboxImageAPI`
  to help get you started with a custom solution using the base data.
  **/
-@objc(MBTerrainNode)
 open class TerrainNode: SCNNode {
 
-    /// Callback typealias for when the new geometry has been loaded based on RGB heightmaps.
-    public typealias TerrainLoadCompletion = (NSError?) -> Void
-    
+    @MainActor
+    public weak var textureImage: UIImage? {
+        didSet {
+            geometry?.materials[4].diffuse.contents = textureImage
+        }
+    }
+
     /// Basic TerrainNode Information
     private let southWestCorner: CLLocation
     private let northEastCorner: CLLocation
@@ -41,24 +44,22 @@ open class TerrainNode: SCNNode {
     }
     
     /// Convenience tuple represending the bounds of altitude after heightmaps have been loaded.
-    private(set) var altitudeBounds: (CLLocationDistance, CLLocationDistance) = (0.0, 1.0)
+    private(set) var altitudeBounds: (minZ: CLLocationDistance, maxZ: CLLocationDistance) = (0.0, 1.0)
     
     /// APIs and Tile fetching
     private let api = MapboxImageAPI()
-    fileprivate var pendingFetches = [UUID]()
-    private static let queue = DispatchQueue(label: "com.mapbox.scenekit.processing", attributes: [.concurrent])
 
     required public init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    @objc public init(southWestCorner: CLLocation, northEastCorner: CLLocation) {
+    public init(southWestCorner: CLLocation, northEastCorner: CLLocation) {
         
         assert(CLLocationCoordinate2DIsValid(southWestCorner.coordinate), "TerrainNode southWestCorner coordinates are invalid.")
         assert(CLLocationCoordinate2DIsValid(northEastCorner.coordinate), "TerrainNode northEastCorner coordinates are invalid.")
         assert(southWestCorner.coordinate.latitude < northEastCorner.coordinate.latitude, "southWestCorner must be South of northEastCorner")
         assert(southWestCorner.coordinate.longitude < northEastCorner.coordinate.longitude, "southWestCorner must be West of northEastCorner")
-        
+
         self.southWestCorner = southWestCorner
         self.northEastCorner = northEastCorner
         self.styleZoomLevel = Math.zoomLevelForBounds(southWestCorner: southWestCorner,
@@ -75,15 +76,12 @@ open class TerrainNode: SCNNode {
                           chamferRadius: 0.0)
     }
 
-    @objc public convenience init(minLat: CLLocationDegrees, maxLat: CLLocationDegrees, minLon: CLLocationDegrees, maxLon: CLLocationDegrees) {
+    public convenience init(minLat: CLLocationDegrees, maxLat: CLLocationDegrees, minLon: CLLocationDegrees, maxLon: CLLocationDegrees) {
         self.init(southWestCorner: CLLocation(latitude: minLat, longitude: minLon),
                   northEastCorner: CLLocation(latitude: maxLat, longitude: maxLon))
     }
 
     deinit {
-        for task in pendingFetches {
-            api.cancelRequestWithID(task)
-        }
     }
 
     private func centerPivot() {
@@ -101,7 +99,7 @@ open class TerrainNode: SCNNode {
     ///
     /// - Parameter location: Location in the real world.
     /// - Returns: Vector position should be converted from the terrain local space to the world space (or another node's corrdinate space, as needed).
-    @objc public func positionForLocation(_ location: CLLocation) -> SCNVector3 {
+    public func positionForLocation(_ location: CLLocation) -> SCNVector3 {
         let coords = latLonToMeters(location: location)
         let groundLevel = heightForLocalPosition(SCNVector3(coords.x, 0.0, coords.z))
         
@@ -112,7 +110,7 @@ open class TerrainNode: SCNNode {
     ///
     /// - Parameter position: postion for the height lookup in the terrainNode's local space.
     /// - Returns: height value at the input position. Apply this to the Y component of the input position to place it on the TerrainNode's surface.
-    @objc public func heightForLocalPosition(_ position: SCNVector3) -> Double {
+    public func heightForLocalPosition(_ position: SCNVector3) -> Double {
         let coords = (x: position.x, z: position.z)
         
         if let groundLevel = TerrainNode.height(heights: terrainHeights, x: coords.x, z: coords.z, metersPerX: metersPerPixelX, metersPerY: metersPerPixelY) {
@@ -134,66 +132,92 @@ open class TerrainNode: SCNNode {
     ///   - heightCompletion: Handler for complete height update.
     ///   - textureProgress: Handler for texture progress change.
     ///   - textureCompletion: Handler for complete texture update. It is up to the caller to apply it as a material component, but this gives the caller the opportunity to modify the image or apply it as something other then default diffuse contents. For the simplist usage, you'll want to apply it as the diffuse contents in position 4 (the top): `myTerrainNode.geometry?.materials[4].diffuse.contents = image`.
-    @objc public func fetchTerrainAndTexture(minWallHeight: CLLocationDistance = 0.0, multiplier: Float = 1, enableDynamicShadows shadows: Bool = false, textureStyle style: String,
-                                             heightProgress: MapboxImageAPI.TileLoadProgressCallback? = nil, heightCompletion: @escaping TerrainLoadCompletion,
-                                             textureProgress: MapboxImageAPI.TileLoadProgressCallback? = nil, textureCompletion: @escaping MapboxImageAPI.TileLoadCompletion) {
+    public func fetchTerrain(
+        minWallHeight: CLLocationDistance = 0.0,
+        multiplier: Float = 1,
+        enableDynamicShadows shadows: Bool = false,
+        heightProgress: MapboxImageAPI.TileLoadProgressCallback? = nil,
+        rendererProgress: MapboxImageAPI.TileLoadProgressCallback? = nil
+    ) async throws {
         let retryNumber = Constants.maxRequestAttempts
-        fetchTerrainAndTexture(minWallHeight: minWallHeight,
-                               multiplier: multiplier,
-                               enableDynamicShadows: shadows,
-                               textureStyle: style,
-                               retryNumber: retryNumber,
-                               heightProgress: heightProgress,
-                               heightCompletion: heightCompletion,
-                               textureProgress: textureProgress,
-                               textureCompletion: textureCompletion)
+        try await doFetchTerrain(
+            minWallHeight: minWallHeight,
+            multiplier: multiplier,
+            enableDynamicShadows: shadows,
+            retryNumber: retryNumber,
+            heightProgress: heightProgress,
+            rendererProgress: rendererProgress
+        )
     }
-    
-    private func fetchTerrainAndTexture(minWallHeight: CLLocationDistance = 0.0, multiplier: Float, enableDynamicShadows shadows: Bool = false, textureStyle style: String,
-                                        retryNumber: Int, heightProgress: MapboxImageAPI.TileLoadProgressCallback? = nil,
-                                        heightCompletion: @escaping TerrainLoadCompletion, textureProgress: MapboxImageAPI.TileLoadProgressCallback? = nil,
-                                        textureCompletion: @escaping MapboxImageAPI.TileLoadCompletion) {
+
+    private func doFetchTerrain(
+        minWallHeight: CLLocationDistance = 0.0,
+        multiplier: Float,
+        enableDynamicShadows shadows: Bool = false,
+        retryNumber: Int,
+        heightProgress: MapboxImageAPI.TileLoadProgressCallback? = nil,
+        rendererProgress: MapboxImageAPI.TileLoadProgressCallback? = nil
+    ) async throws {
+
+        heightProgress?(0, 1)
+
+        let terrainImage = try await fetchTerrainHeights(
+            zoomLevel: terrainZoomLevel,
+            retryNumber: retryNumber,
+            progress: heightProgress
+        )
+
+        heightProgress?(1, 1)
         
-        fetchTerrainHeights(minWallHeight: minWallHeight,
-                            multiplier: multiplier,
-                            enableDynamicShadows: shadows,
-                            zoomLevel: terrainZoomLevel,
-                            retryNumber: retryNumber,
-                            progress: heightProgress) {
-            [weak self] heightFetchError in
-            guard let `self` = self else { return }
-            guard let heightFetchError = heightFetchError else {
-                // if there is no fetch error, height data is available
-                heightCompletion(nil)
-                return
-            }
-            
-            // if there was an issue fetching heights, let's try for a different zoom level
-            if retryNumber > 0 {
-                self.terrainZoomLevel -= 1
-                let decrementRetryNumber = retryNumber - 1
-                self.fetchTerrainAndTexture(minWallHeight: minWallHeight,
-                                            multiplier: multiplier,
-                                            enableDynamicShadows: shadows,
-                                            textureStyle: style,
-                                            retryNumber: decrementRetryNumber,
-                                            heightProgress: heightProgress,
-                                            heightCompletion: heightCompletion,
-                                            textureProgress: textureProgress,
-                                            textureCompletion: textureCompletion)
-            } else { // fail download when there's no height data for any zoom level
-                heightCompletion(heightFetchError)
-                textureProgress?(1, 1)
-                textureCompletion(nil, heightFetchError)
-            }
+        guard let terrainImage = terrainImage else {
+            throw FetchError.unknown.toNSError()
         }
         
-        //fetch texture in parallel to heights
-        self.fetchTerrainTexture(style, zoom: self.styleZoomLevel,
-                                 progress: textureProgress,
-                                 completion: textureCompletion)
+        rendererProgress?(0, 1)
+        
+        try Task.checkCancellation()
+        try await self.applyTerrainHeightmap(terrainImage, withWallHeight: minWallHeight, multiplier: multiplier, enableShadows: shadows, progress: rendererProgress)
+
+        rendererProgress?(1, 1)
     }
     
+    public func fetchTexture(
+        textureStyle style: String,
+        textureProgress: MapboxImageAPI.TileLoadProgressCallback? = nil
+    ) async throws -> UIImage? {
+        print("fetchTexture isMainThread?: \(Thread.isMainThread) <<")
+
+        self.textureImage = nil
+        
+        print("fetchTextureTask isMainThread?: \(Thread.isMainThread) <<")
+        
+        let retryNumber = Constants.maxRequestAttempts
+        return try await self.doFetchTexture(
+            textureStyle: style,
+            textureProgress: textureProgress
+        )
+    }
+
+    private func doFetchTexture(
+        textureStyle style: String,
+        textureProgress: MapboxImageAPI.TileLoadProgressCallback? = nil
+    ) async throws -> UIImage? {
+        print("doFetchTexture style: \(style), isMainThread?: \(Thread.isMainThread) <<")
+        
+        textureProgress?(0, 1)
+        
+        try Task.checkCancellation()
+        //fetch texture in parallel to heights
+        let textureImage = try await self.fetchTerrainTexture(style, zoom: self.styleZoomLevel, progress: textureProgress)
+        
+        textureProgress?(1, 1)
+        
+        self.textureImage = textureImage
+        
+        print("doFetchTerrainAndTexture style: \(style) >>")
+        return textureImage
+    }
+
     /// DEPRECATED - Please use instead fetchTerrainAndTexture.
     /// Begins the fetch of terrain-rgb data throught the mapbox API, and then updates the geometry to repersent a to-scale model of the terrain at this location.
     ///
@@ -203,46 +227,49 @@ open class TerrainNode: SCNNode {
     ///   - shadows: Depending on your applied texture / style, you may want to enable dynamic shadowing based on the contour of the terrain for interaction with Scene Kit lighting.
     ///   - progress: Handler for height progress change.
     ///   - completion: Handler for complete height update.
-    @available(*, deprecated, message: "DEPRECATED - Please use instead fetchTerrainAndTexture.")
-    @objc public func fetchTerrainHeights(minWallHeight: CLLocationDistance = 0.0, multiplier: Float = 1, enableDynamicShadows shadows: Bool = false,
-                                          progress: MapboxImageAPI.TileLoadProgressCallback? = nil, completion: @escaping TerrainLoadCompletion) {
-    
-        fetchTerrainHeights(minWallHeight: minWallHeight,
-                            multiplier: multiplier,
-                            enableDynamicShadows: shadows,
-                            zoomLevel: self.terrainZoomLevel,
-                            progress: progress,
-                            completion: completion)
-    }
-    
-    private func fetchTerrainHeights(minWallHeight: CLLocationDistance = 0.0, multiplier: Float, enableDynamicShadows shadows: Bool = false, zoomLevel: Int,
-                                     retryNumber: Int = 3, progress: MapboxImageAPI.TileLoadProgressCallback? = nil, completion: @escaping TerrainLoadCompletion) {
-        
+    private func fetchTerrainHeights(
+        zoomLevel: Int,
+        retryNumber: Int = 3,
+        progress: MapboxImageAPI.TileLoadProgressCallback? = nil
+    ) async throws -> UIImage? {
+
         let southWestCorner = self.southWestCorner
         let northEastCorner = self.northEastCorner
-        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
-            if let taskID = self?.api.image(forTileset: "mapbox.terrain-rgb",
-                                            zoomLevel: zoomLevel,
-                                            southWestCorner: southWestCorner,
-                                            northEastCorner: northEastCorner,
-                                            format: MapboxImageAPI.TileImageFormatPNG,
-                                            progress: progress,
-                                            completion: { image, fetchError in
-                TerrainNode.queue.async {
-                    if let image = image {
-                        self?.applyTerrainHeightmap(image, withWallHeight: minWallHeight, multiplier: multiplier, enableShadows: shadows)
-                    }
-                    DispatchQueue.main.async() {
-                        completion(fetchError)
-                    }
-                }
-            }) {
-                self?.pendingFetches.append(taskID)
+        
+        var image: UIImage?
+        var heightFetchError: Error?
+        var zoomLevel = zoomLevel
+        for i in 0 ..< retryNumber {
+            do {
+                try Task.checkCancellation()
+                image = try await api.image(forTileset: "mapbox.terrain-rgb",
+                                                zoomLevel: zoomLevel,
+                                                southWestCorner: southWestCorner,
+                                                northEastCorner: northEastCorner,
+                                                format: MapboxImageAPI.TileImageFormatPNG,
+                                                progress: progress)
             }
+            catch {
+                try Task.checkCancellation() // throw cancelation here again if canceled to avoid retry
+                heightFetchError = error
+            }
+            
+            if let _ = image {
+                break
+            }
+            
+            zoomLevel -= 1
+            print("retrying: \(i)")
         }
+        
+        guard let image = image else {
+            progress?(1, 1)
+            throw heightFetchError ?? FetchError.unknown.toNSError()
+        }
+        
+        return image
     }
-
-    /// DEPRECATED - Please use instead fetchTerrainAndTexture.
+    
     /// Fetches an image representing a style (either mapbox or user created) to cover this terrain node.
     /// It is up to the caller to apply it as a material component, but this gives the caller the opportunity to modify the image or apply it as something other then default diffuse contents.
     /// For the simplist usage, you'll want to apply it as the diffuse contents in position 4 (the top): `myRerrainNode.geometry?.materials[4].diffuse.contents = image`.
@@ -251,48 +278,42 @@ open class TerrainNode: SCNNode {
     ///   - style: Mapbox style ID for given texture.
     ///   - progress: Handler for fetch progress change.
     ///   - completion: Handler for complete texture update.
-    @available(*, deprecated, message: "DEPRECATED - Please use instead fetchTerrainAndTexture.")
-    @objc public func fetchTerrainTexture(_ style: String, progress: MapboxImageAPI.TileLoadProgressCallback? = nil, completion: @escaping MapboxImageAPI.TileLoadCompletion) {
-        fetchTerrainTexture(style, zoom: terrainZoomLevel, progress: progress, completion: completion)
-    }
-    
-    private func fetchTerrainTexture(_ style: String, zoom: Int, progress: MapboxImageAPI.TileLoadProgressCallback? = nil, completion: @escaping MapboxImageAPI.TileLoadCompletion) {
+    private func fetchTerrainTexture(_ style: String, zoom: Int, progress: MapboxImageAPI.TileLoadProgressCallback? = nil) async throws -> UIImage? {
         let southWestCorner = self.southWestCorner
         let northEastCorner = self.northEastCorner
-        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
-            if let taskID = self?.api.image(forStyle: style,
-                                            zoomLevel: zoom,
-                                            southWestCorner: southWestCorner,
-                                            northEastCorner: northEastCorner,
-                                            progress: progress,
-                                            completion: completion) {
-                self?.pendingFetches.append(taskID)
-            }
-        }
+
+        return try await api.image(
+            forStyle: style,
+            zoomLevel: zoom,
+            southWestCorner: southWestCorner,
+            northEastCorner: northEastCorner,
+            progress: progress
+        )
     }
-
+    
     //MARK: - Geometry Creation
-
-    private func applyTerrainHeightmap(_ image: UIImage,
-                                       withWallHeight wallHeight: CLLocationDistance? = nil,
-                                       multiplier: Float, enableShadows shadows: Bool) {
+    
+    private func terrainHeights(from image: UIImage, multiplier: Float, wallHeight: CLLocationDistance) async throws -> (heights: [[Double]], altitudeBounds: (minZ: CLLocationDistance, maxZ: CLLocationDistance)) {
+        
+        print("terrainHeights isMainThread?: \(Thread.isMainThread) <<")
+        
         guard let pixelData = image.cgImage?.dataProvider?.data, let terrainData = CFDataGetBytePtr(pixelData) else {
             NSLog("Couldn't get CGImage color data for terrain")
-            return
+            throw FetchError.unknown.toNSError()
         }
-        
-        terrainImageSize = image.size
 
         var minZ = Double.greatestFiniteMagnitude
         var maxZ = Double.leastNormalMagnitude
         var newTerrainHeights = [[Double]]()
-        newTerrainHeights.reserveCapacity(Int(terrainImageSize.height))
+        newTerrainHeights.reserveCapacity(Int(image.size.height))
+        
+        for y in 0 ..< Int(image.size.height) {
+            try Task.checkCancellation()
 
-        for y in 0 ..< Int(terrainImageSize.height) {
             var rowData = [Double]()
-            rowData.reserveCapacity(Int(terrainImageSize.width))
-            for x in 0 ..< Int(terrainImageSize.width) {
-                guard let z = TerrainNode.heightFromImage(x: x, y: y, terrainData: terrainData, terrainSize: terrainImageSize, multiplier: multiplier) else {
+            rowData.reserveCapacity(Int(image.size.width))
+            for x in 0 ..< Int(image.size.width) {
+                guard let z = TerrainNode.heightFromImage(x: x, y: y, terrainData: terrainData, terrainSize: image.size, multiplier: multiplier) else {
                     NSLog("Couldn't get Z data for {\(x),\(y)}")
                     continue
                 }
@@ -303,66 +324,152 @@ open class TerrainNode: SCNNode {
             newTerrainHeights.append(rowData)
         }
 
-        terrainHeights = newTerrainHeights.map({ $0.map({ $0 - minZ + (wallHeight ?? 0.0) })})
-        altitudeBounds = (minZ, maxZ)
+        let heights = newTerrainHeights.map({ $0.map({ $0 - minZ + wallHeight })})
+        let bounds = (minZ, maxZ)
+        
+        return (heights, bounds)
+    }
 
+    private func applyTerrainHeightmap(
+        _ image: UIImage,
+        withWallHeight wallHeight: CLLocationDistance? = nil,
+        multiplier: Float,
+        enableShadows shadows: Bool,
+        progress: MapboxImageAPI.TileLoadProgressCallback? = nil
+    ) async throws {
         var vertices = [SCNVector3]()
         var normals = [SCNVector3]()
         var uvList: [vector_float2] = []
         var sources = [SCNGeometrySource]()
         var elements = [SCNGeometryElement]()
 
+        progress?(0, 1)
+        let terrainHeights = try await self.terrainHeights(from: image, multiplier: multiplier, wallHeight: wallHeight ?? 0.0)
+        
+        self.terrainImageSize = image.size
+        self.terrainHeights = terrainHeights.heights
+        self.altitudeBounds = terrainHeights.altitudeBounds
+
         //Adding these geometries in the same order they'd appear in an SCNBox, so previously applied materials stay on the same side / order
+        
+        //let imageSize = self.terrainImageSize
+        let imageSize = image.size
+        let heights = self.terrainHeights
+        let sizeInMeters = self.terrainSizeMeters
+        let metersPerPixelX = self.metersPerPixelX
+        let metersPerPixelY = self.metersPerPixelY
+        
+        let minZ = self.altitudeBounds.minZ
+        let maxZ = self.altitudeBounds.maxZ
+        
         if let wallHeight = wallHeight {
-            let south = createGeometryForWall(xs: [Int](0..<Int(terrainImageSize.width)),
-                                              ys: [Int(terrainImageSize.height) - 1],
-                                              normal: SCNVector3Make(0, 0, -1),
-                                              maxHeight: Float(maxZ + wallHeight - minZ),
-                                              vertexOffset: vertices.count)
+            // MARK: South
+            progress?(0.1, 1)
+            try Task.checkCancellation()
+            let south = try await createGeometryForWall(
+                xs: [Int](0..<Int(imageSize.width)),
+                ys: [Int(imageSize.height) - 1],
+                normal: SCNVector3Make(0, 0, -1),
+                maxHeight: Float(maxZ + wallHeight - minZ),
+                vertexOffset: vertices.count,
+                terrainImageSize: imageSize,
+                terrainHeights: heights,
+                terrainSizeInMeters: sizeInMeters,
+                metersPerPixelX: metersPerPixelX,
+                metersPerPixelY: metersPerPixelY
+            )
+
+            await Task.yield()
             vertices.append(contentsOf: south.vertices)
             normals.append(contentsOf: south.normals)
             uvList.append(contentsOf: south.uvList)
             elements.append(south.element)
             
-            let east = createGeometryForWall(xs: [Int(terrainImageSize.width) - 1],
-                                             ys: [Int](0..<Int(terrainImageSize.height)),
-                                             normal: SCNVector3Make(1, 0, 0),
-                                             maxHeight: Float(maxZ + wallHeight - minZ),
-                                             vertexOffset: vertices.count)
+            // MARK: East
+            progress?(0.2, 1)
+            try Task.checkCancellation()
+            let east = try await createGeometryForWall(
+                xs: [Int(terrainImageSize.width) - 1],
+                ys: [Int](0..<Int(terrainImageSize.height)),
+                normal: SCNVector3Make(1, 0, 0),
+                maxHeight: Float(maxZ + wallHeight - minZ),
+                vertexOffset: vertices.count,
+                terrainImageSize: imageSize,
+                terrainHeights: heights,
+                terrainSizeInMeters: sizeInMeters,
+                metersPerPixelX: metersPerPixelX,
+                metersPerPixelY: metersPerPixelY
+            )
+            
+            await Task.yield()
             vertices.append(contentsOf: east.vertices)
             normals.append(contentsOf: east.normals)
             uvList.append(contentsOf: east.uvList)
             elements.append(east.element)
 
-            let north = createGeometryForWall(xs: [Int](0..<Int(terrainImageSize.width)),
-                                              ys: [0],
-                                              normal: SCNVector3Make(0, 0, -1),
-                                              maxHeight: Float(maxZ + wallHeight - minZ),
-                                              vertexOffset: vertices.count)
+            // MARK: North
+            progress?(0.3, 1)
+            try Task.checkCancellation()
+            let north = try await createGeometryForWall(
+                xs: [Int](0..<Int(terrainImageSize.width)),
+                ys: [0],
+                normal: SCNVector3Make(0, 0, -1),
+                maxHeight: Float(maxZ + wallHeight - minZ),
+                vertexOffset: vertices.count,
+                terrainImageSize: imageSize,
+                terrainHeights: heights,
+                terrainSizeInMeters: sizeInMeters,
+                metersPerPixelX: metersPerPixelX,
+                metersPerPixelY: metersPerPixelY
+            )
+
+            await Task.yield()
             vertices.append(contentsOf: north.vertices)
             normals.append(contentsOf: north.normals)
             uvList.append(contentsOf: north.uvList)
             elements.append(north.element)
 
-            let west = createGeometryForWall(xs: [0],
-                                             ys: [Int](0..<Int(terrainImageSize.height)),
-                                             normal: SCNVector3Make(1, 0, 0),
-                                             maxHeight: Float(maxZ + wallHeight - minZ),
-                                             vertexOffset: vertices.count)
+            // MARK: West
+            progress?(0.4, 1)
+            try Task.checkCancellation()
+            let west = try await createGeometryForWall(
+                xs: [0],
+                ys: [Int](0..<Int(terrainImageSize.height)),
+                normal: SCNVector3Make(1, 0, 0),
+                maxHeight: Float(maxZ + wallHeight - minZ),
+                vertexOffset: vertices.count,
+                terrainImageSize: imageSize,
+                terrainHeights: heights,
+                terrainSizeInMeters: sizeInMeters,
+                metersPerPixelX: metersPerPixelX,
+                metersPerPixelY: metersPerPixelY
+            )
+            
+            await Task.yield()
             vertices.append(contentsOf: west.vertices)
             normals.append(contentsOf: west.normals)
             uvList.append(contentsOf: west.uvList)
             elements.append(west.element)
         }
 
-        let top = createTopGeometry(vertexOffset: vertices.count, enableShadows: shadows)
+        // MARK: Top
+        progress?(0.5, 1)
+        try Task.checkCancellation()
+        let top = try await self.createTopGeometry(vertexOffset: vertices.count, enableShadows: shadows, imageSize: imageSize, heights: heights, sizeInMeters: sizeInMeters)
+
+        await Task.yield()
         vertices.append(contentsOf: top.vertices)
         normals.append(contentsOf: top.normals)
         uvList.append(contentsOf: top.uvList)
         elements.append(top.element)
 
         if wallHeight != nil {
-            let bottom = createGeometryForBottom(vertexOffset: vertices.count)
+            // MARK: Bottom
+            progress?(0.6, 1)
+            try Task.checkCancellation()
+            let bottom = await createGeometryForBottom(vertexOffset: vertices.count, imageSize: imageSize)
+	    
+            await Task.yield()
             vertices.append(contentsOf: bottom.vertices)
             normals.append(contentsOf: bottom.normals)
             uvList.append(contentsOf: bottom.uvList)
@@ -394,24 +501,28 @@ open class TerrainNode: SCNNode {
         geometry?.materials = originalMaterials
         centerPivot()
         position = originalPosition
+
+        progress?(1, 1)
     }
 
-    private func createTopGeometry(vertexOffset: Int, enableShadows: Bool) -> (element: SCNGeometryElement, vertices: [SCNVector3], normals: [SCNVector3], uvList: [vector_float2]) {
+    //private func createTopGeometry(vertexOffset: Int, enableShadows: Bool) -> (element: SCNGeometryElement, vertices: [SCNVector3], normals: [SCNVector3], uvList: [vector_float2]) {
+    private func createTopGeometry(vertexOffset: Int, enableShadows: Bool, imageSize: CGSize, heights: [[Double]], sizeInMeters: CGSize) async throws -> (element: SCNGeometryElement, vertices: [SCNVector3], normals: [SCNVector3], uvList: [vector_float2]) {
+     
         var vertices = [SCNVector3]()
-        vertices.reserveCapacity(Int(terrainImageSize.height * terrainImageSize.width))
-        var normals = [SCNVector3](repeating: SCNVector3(0, 1, 0), count: Int(terrainImageSize.height * terrainImageSize.width))
+        vertices.reserveCapacity(Int(imageSize.height * imageSize.width))
+        var normals = [SCNVector3](repeating: SCNVector3(0, 1, 0), count: Int(imageSize.height * imageSize.width))
         var uvList: [vector_float2] = []
-        uvList.reserveCapacity(Int(terrainImageSize.height * terrainImageSize.width))
+        uvList.reserveCapacity(Int(imageSize.height * imageSize.width))
         let cint: CInt = 0
         let sizeOfCInt = MemoryLayout.size(ofValue: cint)
 
         let geometryData = NSMutableData()
-        for y in 0..<Int(terrainImageSize.height) {
-            let previousRowStart = (y - 1) * Int(terrainImageSize.width)
-            let currentRowStart = y * Int(terrainImageSize.width)
+        for y in 0..<Int(imageSize.height) {
+            let previousRowStart = (y - 1) * Int(imageSize.width)
+            let currentRowStart = y * Int(imageSize.width)
 
-            for x in 0..<Int(terrainImageSize.width) {
-                guard let z = TerrainNode.height(heights: terrainHeights, x: x, y: y), let xz = terrainImagePixelsToMeters(imageX: x, imageY: y) else {
+            for x in 0..<Int(imageSize.width) {
+                guard let z = TerrainNode.height(heights: heights, x: x, y: y), let xz = terrainImagePixelsToMeters(imageX: x, imageY: y) else {
                     NSLog("Couldn't coordinates for \(x),\(y)")
                     continue
                 }
@@ -419,7 +530,7 @@ open class TerrainNode: SCNNode {
                 vertices.append(SCNVector3Make(xz.x, Float(z), xz.z))
 
                 //texture support
-                uvList.append(vector_float2(Float(Float(x) / Float(terrainImageSize.width)), Float(Float(y) / Float(terrainImageSize.height))))
+                uvList.append(vector_float2(Float(Float(x) / Float(imageSize.width)), Float(Float(y) / Float(imageSize.height))))
 
                 //past first row, build the faces as we go (skipping first column)
                 if y > 0 && x > 0 {
@@ -442,14 +553,16 @@ open class TerrainNode: SCNNode {
 
         return (element: SCNGeometryElement(data: geometryData as Data,
                                             primitiveType: .triangles,
-                                            primitiveCount: (Int(terrainImageSize.height) - 1) * (Int(terrainImageSize.width) - 1) * 2,
+                                            primitiveCount: (Int(imageSize.height) - 1) * (Int(imageSize.width) - 1) * 2,
                                             bytesPerIndex: sizeOfCInt),
                 vertices: vertices,
                 normals: normals,
                 uvList: uvList)
     }
 
-    private func createGeometryForBottom(vertexOffset: Int) -> (element: SCNGeometryElement, vertices: [SCNVector3], normals: [SCNVector3], uvList: [vector_float2]) {
+    //private func createGeometryForBottom(vertexOffset: Int) -> (element: SCNGeometryElement, vertices: [SCNVector3], normals: [SCNVector3], uvList: [vector_float2]) {
+    private func createGeometryForBottom(vertexOffset: Int, imageSize: CGSize) async -> (element: SCNGeometryElement, vertices: [SCNVector3], normals: [SCNVector3], uvList: [vector_float2]) {
+
         let bottomGeometryData = NSMutableData()
         var vertices = [SCNVector3]()
         vertices.reserveCapacity(4)
@@ -457,7 +570,7 @@ open class TerrainNode: SCNNode {
         uvList.reserveCapacity(4)
 
         let minXZ = terrainImagePixelsToMeters(imageX: 0, imageY: 0)!
-        let maxXZ = terrainImagePixelsToMeters(imageX: Int(terrainImageSize.width) - 1, imageY: Int(terrainImageSize.height) - 1)!
+        let maxXZ = terrainImagePixelsToMeters(imageX: Int(imageSize.width) - 1, imageY: Int(imageSize.height) - 1)!
         vertices.append(SCNVector3Make(minXZ.x, Float(0.0), minXZ.z))
         uvList.append(vector_float2(Float(0.0), Float(0.0)))
         vertices.append(SCNVector3Make(maxXZ.x, Float(0.0), minXZ.z))
@@ -484,7 +597,20 @@ open class TerrainNode: SCNNode {
                 uvList: uvList)
     }
 
-    private func createGeometryForWall(xs: [Int], ys: [Int], normal: SCNVector3, maxHeight: Float, vertexOffset: Int) -> (element: SCNGeometryElement, vertices: [SCNVector3], normals: [SCNVector3], uvList: [vector_float2]) {
+    //private func createGeometryForWall(xs: [Int], ys: [Int], normal: SCNVector3, maxHeight: Float, vertexOffset: Int) -> (element: SCNGeometryElement, vertices: [SCNVector3], normals: [SCNVector3], uvList: [vector_float2]) {
+    private func createGeometryForWall(
+            xs: [Int],
+            ys: [Int],
+            normal: SCNVector3,
+            maxHeight: Float,
+            vertexOffset: Int,
+            terrainImageSize: CGSize,
+            terrainHeights: [[Double]],
+            terrainSizeInMeters: CGSize,
+            metersPerPixelX: Double,
+            metersPerPixelY: Double
+        ) async throws -> (element: SCNGeometryElement, vertices: [SCNVector3], normals: [SCNVector3], uvList: [vector_float2]) {
+
         let sideGeometryData = NSMutableData()
         var vertices = [SCNVector3]()
         vertices.reserveCapacity(xs.count * ys.count * 2)

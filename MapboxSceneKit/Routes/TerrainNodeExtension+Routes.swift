@@ -9,7 +9,7 @@
 import Foundation
 import SceneKit
 import CoreLocation
-
+#if false
 extension TerrainNode {
     /// Converts a set of coordinates to SCNVector3s relative to the TerrainNode,
     /// then adds a PolylineNode through those locations.
@@ -20,7 +20,6 @@ extension TerrainNode {
     ///   - color: The color of the line
     /// - Returns: The final PolylineNode, already added as a child of the TerrainNode
     @discardableResult
-    @objc
     public func addPolyline(coordinates: [CLLocation], radius: CGFloat, color: UIColor) -> PolylineNode {
 
         let scenePositions = coordinatesToSCNVector3(coordinates: coordinates)
@@ -41,7 +40,6 @@ extension TerrainNode {
     ///   - endColor: The color of the final point of the line. Linearly interpolated from start to end.
     /// - Returns: The final PolylineNode, already added as a child of the TerrainNode
     @discardableResult
-    @objc
     @available(iOS 10.0, *)
     public func addPolyline(coordinates: [CLLocation], startRadius: CGFloat, endRadius: CGFloat,
                             startColor: UIColor, endColor: UIColor) -> PolylineNode {
@@ -56,7 +54,6 @@ extension TerrainNode {
     }
 
     @discardableResult
-    @objc
     @available(iOS 10.0, *)
     public func addPolyline(coordinates: [CLLocation],
                             radii: [CGFloat],
@@ -144,3 +141,4 @@ extension TerrainNode {
         return newPositions
     }
 }
+#endif

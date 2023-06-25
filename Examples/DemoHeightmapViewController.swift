@@ -62,38 +62,94 @@ class DemoHeightmapViewController: UIViewController {
         applyStyle(styles.first!)
     }
 
+    private var fetchTask: Task<Void, Error>?
+
     private func applyStyle(_ style: String) {
         guard let terrainNode = terrainNode else {
             return
         }
-
+        
         self.progressView?.progress = 0.0
         
         //Time to hit the web API and load Mapbox heightmap data for the terrain node
         //Note, you can also wait to place the node until after this fetch has completed. It doesn't have to be in-scene to fetch.
         let terrainFetcherHandler = progressHandler.registerForProgress()
         let terrainRendererHandler = progressHandler.registerForProgress()
-        progressHandler.updateProgress(handlerID: terrainRendererHandler, progress: 0, total: 1)
         let textureFetchHandler = progressHandler.registerForProgress()
-        terrainNode.fetchTerrainAndTexture(minWallHeight: 50.0, multiplier: 1.5, enableDynamicShadows: false, textureStyle: style, heightProgress: { progress, total in
-            self.progressHandler.updateProgress(handlerID: terrainFetcherHandler, progress: progress, total: total)
-        }, heightCompletion: { heightFetchError in
-            if let heightFetchError = heightFetchError {
-                NSLog("Texture load failed: \(heightFetchError.localizedDescription)")
-            } else {
-                NSLog("Terrain load complete")
+        
+        fetchTask?.cancel()
+        fetchTask = Task {
+            await loadTerrain(
+                terrainNode: terrainNode,
+                terrainFetcherHandler: terrainFetcherHandler,
+                terrainRendererHandler: terrainRendererHandler
+            )
+            
+            await loadTexture(
+                style: style,
+                terrainNode: terrainNode,
+                textureFetchHandler: textureFetchHandler
+            )
+        } // Task
+    }
+    
+    private func loadTerrain(
+        terrainNode: TerrainNode,
+        terrainFetcherHandler: Int,
+        terrainRendererHandler: Int
+    ) async {
+        do {
+            try await terrainNode.fetchTerrain(
+                minWallHeight: 50.0,
+                multiplier: 1.5,
+                enableDynamicShadows: false,
+                heightProgress: { [weak self] (progress, total) in
+                    Task { @MainActor in
+                        self?.progressHandler.updateProgress(handlerID: terrainFetcherHandler, progress: progress, total: total)
+                    }
+                },
+                rendererProgress: { [weak self] (progress, total) in
+                    Task { @MainActor in
+                        //print("progress: \(progress) / \(total)")
+                        self?.progressHandler.updateProgress(handlerID: terrainRendererHandler, progress: progress, total: total)
+                    }
+                }
+            )
+        }
+        catch {
+            Task { @MainActor in
+                progressHandler.updateProgress(handlerID: terrainFetcherHandler, progress: 1, total: 1)
+                progressHandler.updateProgress(handlerID: terrainRendererHandler, progress: 1, total: 1)
             }
-            self.progressHandler.updateProgress(handlerID: terrainRendererHandler, progress: 1, total: 1)
-        }, textureProgress: { progress, total in
-            self.progressHandler.updateProgress(handlerID: textureFetchHandler, progress: progress, total: total)
-        }) { image, textureFetchError in
-            if let textureFetchError = textureFetchError {
-                NSLog("Texture load failed: \(textureFetchError.localizedDescription)")
+        }
+    }
+    
+    private func loadTexture(
+            style: String,
+            terrainNode: TerrainNode,
+            textureFetchHandler: Int
+    ) async {
+        var textureImage: UIImage?
+        var textureFetchError: Error?
+        do {
+            textureImage = try await terrainNode.fetchTexture(
+                textureStyle: style,
+                textureProgress: { [weak self] (progress, total) in
+                    Task { @MainActor in
+                        //print("progress: \(progress) / \(total)")
+                        self?.progressHandler.updateProgress(handlerID: textureFetchHandler, progress: progress, total: total)
+                    }
+                })
+        }
+        catch {
+            Task { @MainActor in
+                progressHandler.updateProgress(handlerID: textureFetchHandler, progress: 1, total: 1)
             }
-            if image != nil {
-                NSLog("Texture load for \(style) complete")
-                terrainNode.geometry?.materials[4].diffuse.contents = image
-            }
+            textureFetchError = error
+        }
+        
+        if let textureFetchError = textureFetchError {
+            print("Texture load failed: \(textureFetchError.localizedDescription)")
         }
     }
 

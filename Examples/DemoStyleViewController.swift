@@ -11,9 +11,22 @@ class DemoStyleViewController: UIViewController {
     @IBOutlet private weak var progressView: UIProgressView?
     @IBOutlet private weak var stylePicker: UISegmentedControl?
     private weak var terrainNode: TerrainNode?
+    private var progressHandler: ProgressCompositor!
 
     private let styles = ["mapbox/outdoors-v10", "mapbox/satellite-v9", "mapbox/navigation-preview-day-v2"]
 
+    required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+
+        //Progress handler is a helper to aggregate progress through the three stages causing user wait: fetching heightmap images, calculating/rendering the heightmap, fetching the texture images
+        progressHandler = ProgressCompositor(updater: { [weak self] progress in
+            self?.progressView?.progress = progress
+            self?.progressView?.isHidden = false
+        }, completer: { [weak self] in
+            self?.progressView?.isHidden = true
+        })
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -50,6 +63,8 @@ class DemoStyleViewController: UIViewController {
         applyStyle(styles.first!)
     }
 
+    private var fetchTask: Task<Void, Error>?
+
     private func applyStyle(_ style: String) {
         guard let terrainNode = terrainNode else {
             return
@@ -57,24 +72,48 @@ class DemoStyleViewController: UIViewController {
 
         self.progressView?.progress = 0.0
         self.progressView?.isHidden = false
-        
-        // we want to fetch texture only here, so we don't need to use the new fetching of both height and texture
-        // for which this method was deprecated. Probably in real app you'll never want to present texture without
-        // heights, so it stays here for easier example to let you get the idea faster as 1st simplest solution
-        terrainNode.fetchTerrainTexture(style, progress: { progress, total in
-            self.progressView?.progress = progress
 
-        }, completion: { image, fetchError in
-            if let fetchError = fetchError {
-                NSLog("Texture load failed: \(fetchError.localizedDescription)")
-            }
-            if image != nil {
-                NSLog("Texture load complete")
-                terrainNode.geometry?.materials[4].diffuse.contents = image
-            }
-            self.progressView?.isHidden = true
-        })
+        let textureFetchHandler = progressHandler.registerForProgress()
+        
+        fetchTask?.cancel()
+        fetchTask = Task {
+            await loadTexture(
+                style: style,
+                terrainNode: terrainNode,
+                textureFetchHandler: textureFetchHandler
+            )
+        } // Task
+        
     }
+
+    private func loadTexture(
+            style: String,
+            terrainNode: TerrainNode,
+            textureFetchHandler: Int
+        ) async {
+            var textureImage: UIImage?
+            var textureFetchError: Error?
+            do {
+                textureImage = try await terrainNode.fetchTexture(
+                    textureStyle: style,
+                    textureProgress: { [weak self] (progress, total) in
+                        Task { @MainActor in
+                            //print("progress: \(progress) / \(total)")
+                            self?.progressHandler.updateProgress(handlerID: textureFetchHandler, progress: progress, total: total)
+                        }
+                    })
+            }
+            catch {
+                Task { @MainActor in
+                    progressHandler.updateProgress(handlerID: textureFetchHandler, progress: 1, total: 1)
+                }
+                textureFetchError = error
+            }
+            
+            if let textureFetchError = textureFetchError {
+                print("Texture load failed: \(textureFetchError.localizedDescription)")
+            }
+        }
 
     private func defaultMaterials() -> [SCNMaterial] {
         let groundImage = SCNMaterial()
