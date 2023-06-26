@@ -16,26 +16,26 @@ open class TerrainNode: SCNNode {
     }
 
     /// Basic TerrainNode Information
-    private let southWestCorner: CLLocation
-    private let northEastCorner: CLLocation
-    private let styleZoomLevel: Int
-    private var terrainZoomLevel: Int
+    @MainActor private let southWestCorner: CLLocation
+    @MainActor private let northEastCorner: CLLocation
+    @MainActor private let styleZoomLevel: Int
+    @MainActor private var terrainZoomLevel: Int
     
     /// Unit conversions
-    fileprivate let metersPerLat: Double
-    fileprivate let metersPerLon: Double
-    private(set) internal var metersPerPixelX: Double = 0
-    private(set) internal var metersPerPixelY: Double = 0
+    @MainActor fileprivate let metersPerLat: Double
+    @MainActor fileprivate let metersPerLon: Double
+    @MainActor private(set) internal var metersPerPixelX: Double = 0
+    @MainActor private(set) internal var metersPerPixelY: Double = 0
     
     /// TerrainNode Sizes
-    fileprivate var terrainHeights = [[Double]]()
-    fileprivate var terrainSizeMeters: CGSize {
+    @MainActor fileprivate var terrainHeights = [[Double]]()
+    @MainActor fileprivate var terrainSizeMeters: CGSize {
             let x = Double(northEastCorner.coordinate.longitude - southWestCorner.coordinate.longitude) * metersPerLon
             let z = Double(northEastCorner.coordinate.latitude - southWestCorner.coordinate.latitude) * metersPerLat
             return CGSize(width: x, height: z)
     }
     
-    fileprivate var terrainImageSize: CGSize = CGSize.zero {
+    @MainActor fileprivate var terrainImageSize: CGSize = CGSize.zero {
         didSet {
             //update meters per pixel value when terrain image size changes
             metersPerPixelX = Double(abs(terrainSizeMeters.width)) / Double(terrainImageSize.width)
@@ -44,8 +44,8 @@ open class TerrainNode: SCNNode {
     }
     
     /// Convenience tuple represending the bounds of altitude after heightmaps have been loaded.
-    private(set) var altitudeBounds: (minZ: CLLocationDistance, maxZ: CLLocationDistance) = (0.0, 1.0)
-    
+    @MainActor private(set) var altitudeBounds: (minZ: CLLocationDistance, maxZ: CLLocationDistance) = (0.0, 1.0)
+
     /// APIs and Tile fetching
     private let api = MapboxImageAPI()
 
@@ -161,7 +161,7 @@ open class TerrainNode: SCNNode {
 
         heightProgress?(0, 1)
 
-        let terrainImage = try await fetchTerrainHeights(
+        async let terrainImage = fetchTerrainHeights(
             zoomLevel: terrainZoomLevel,
             retryNumber: retryNumber,
             progress: heightProgress
@@ -169,7 +169,7 @@ open class TerrainNode: SCNNode {
 
         heightProgress?(1, 1)
         
-        guard let terrainImage = terrainImage else {
+        guard let terrainImage = try await terrainImage else {
             throw FetchError.unknown.toNSError()
         }
         
@@ -187,15 +187,19 @@ open class TerrainNode: SCNNode {
     ) async throws -> UIImage? {
         print("fetchTexture isMainThread?: \(Thread.isMainThread) <<")
 
-        self.textureImage = nil
+        textureImage = nil
         
-        print("fetchTextureTask isMainThread?: \(Thread.isMainThread) <<")
-        
-        let retryNumber = Constants.maxRequestAttempts
-        return try await self.doFetchTexture(
+        textureProgress?(0, 1)
+
+        let image = try await self.doFetchTexture(
             textureStyle: style,
             textureProgress: textureProgress
         )
+        
+        textureProgress?(1, 1)
+        textureImage = image
+
+        return image
     }
 
     private func doFetchTexture(
@@ -203,9 +207,7 @@ open class TerrainNode: SCNNode {
         textureProgress: MapboxImageAPI.TileLoadProgressCallback? = nil
     ) async throws -> UIImage? {
         print("doFetchTexture style: \(style), isMainThread?: \(Thread.isMainThread) <<")
-        
-        textureProgress?(0, 1)
-        
+
         try Task.checkCancellation()
         //fetch texture in parallel to heights
         let textureImage = try await self.fetchTerrainTexture(style, zoom: self.styleZoomLevel, progress: textureProgress)
@@ -232,9 +234,6 @@ open class TerrainNode: SCNNode {
         retryNumber: Int = 3,
         progress: MapboxImageAPI.TileLoadProgressCallback? = nil
     ) async throws -> UIImage? {
-
-        let southWestCorner = self.southWestCorner
-        let northEastCorner = self.northEastCorner
         
         var image: UIImage?
         var heightFetchError: Error?
@@ -242,12 +241,14 @@ open class TerrainNode: SCNNode {
         for i in 0 ..< retryNumber {
             do {
                 try Task.checkCancellation()
-                image = try await api.image(forTileset: "mapbox.terrain-rgb",
-                                                zoomLevel: zoomLevel,
-                                                southWestCorner: southWestCorner,
-                                                northEastCorner: northEastCorner,
-                                                format: MapboxImageAPI.TileImageFormatPNG,
-                                                progress: progress)
+                image = try await api.image(
+                    forTileset: "mapbox.terrain-rgb",
+                    zoomLevel: zoomLevel,
+                    southWestCorner: southWestCorner,
+                    northEastCorner: northEastCorner,
+                    format: MapboxImageAPI.TileImageFormatPNG,
+                    progress: progress
+                )
             }
             catch {
                 try Task.checkCancellation() // throw cancelation here again if canceled to avoid retry
@@ -279,8 +280,6 @@ open class TerrainNode: SCNNode {
     ///   - progress: Handler for fetch progress change.
     ///   - completion: Handler for complete texture update.
     private func fetchTerrainTexture(_ style: String, zoom: Int, progress: MapboxImageAPI.TileLoadProgressCallback? = nil) async throws -> UIImage? {
-        let southWestCorner = self.southWestCorner
-        let northEastCorner = self.northEastCorner
 
         return try await api.image(
             forStyle: style,
@@ -346,106 +345,104 @@ open class TerrainNode: SCNNode {
         progress?(0, 1)
         let terrainHeights = try await self.terrainHeights(from: image, multiplier: multiplier, wallHeight: wallHeight ?? 0.0)
         
-        self.terrainImageSize = image.size
+        terrainImageSize = image.size
         self.terrainHeights = terrainHeights.heights
-        self.altitudeBounds = terrainHeights.altitudeBounds
+        altitudeBounds = terrainHeights.altitudeBounds
 
         //Adding these geometries in the same order they'd appear in an SCNBox, so previously applied materials stay on the same side / order
-        
-        //let imageSize = self.terrainImageSize
-        let imageSize = image.size
-        let heights = self.terrainHeights
-        let sizeInMeters = self.terrainSizeMeters
-        let metersPerPixelX = self.metersPerPixelX
-        let metersPerPixelY = self.metersPerPixelY
-        
-        let minZ = self.altitudeBounds.minZ
-        let maxZ = self.altitudeBounds.maxZ
-        
+
         if let wallHeight = wallHeight {
+            let minZ = altitudeBounds.minZ
+            let maxZ = altitudeBounds.maxZ
+            let southVerticesCount = vertices.count
+
             // MARK: South
             progress?(0.1, 1)
             try Task.checkCancellation()
-            let south = try await createGeometryForWall(
-                xs: [Int](0..<Int(imageSize.width)),
-                ys: [Int(imageSize.height) - 1],
+            async let southData = self.createGeometryForWall(
+                xs: [Int](0..<Int(image.size.width)),
+                ys: [Int(image.size.height) - 1],
                 normal: SCNVector3Make(0, 0, -1),
                 maxHeight: Float(maxZ + wallHeight - minZ),
-                vertexOffset: vertices.count,
-                terrainImageSize: imageSize,
-                terrainHeights: heights,
-                terrainSizeInMeters: sizeInMeters,
+                vertexOffset: southVerticesCount,
+                terrainImageSize: image.size,
+                terrainHeights: terrainHeights.heights,
+                terrainSizeInMeters: terrainSizeMeters,
                 metersPerPixelX: metersPerPixelX,
                 metersPerPixelY: metersPerPixelY
             )
 
-            await Task.yield()
+            let south = try await southData
             vertices.append(contentsOf: south.vertices)
             normals.append(contentsOf: south.normals)
             uvList.append(contentsOf: south.uvList)
             elements.append(south.element)
             
             // MARK: East
+            let eastVerticesCount = vertices.count
             progress?(0.2, 1)
             try Task.checkCancellation()
-            let east = try await createGeometryForWall(
-                xs: [Int(terrainImageSize.width) - 1],
-                ys: [Int](0..<Int(terrainImageSize.height)),
+            async let eastData = createGeometryForWall(
+                xs: [Int(image.size.width) - 1],
+                ys: [Int](0..<Int(image.size.height)),
                 normal: SCNVector3Make(1, 0, 0),
                 maxHeight: Float(maxZ + wallHeight - minZ),
-                vertexOffset: vertices.count,
-                terrainImageSize: imageSize,
-                terrainHeights: heights,
-                terrainSizeInMeters: sizeInMeters,
+                vertexOffset: eastVerticesCount,
+                terrainImageSize: image.size,
+                terrainHeights: terrainHeights.heights,
+                terrainSizeInMeters: terrainSizeMeters,
                 metersPerPixelX: metersPerPixelX,
                 metersPerPixelY: metersPerPixelY
             )
             
-            await Task.yield()
+            try Task.checkCancellation()
+            let east = try await eastData
             vertices.append(contentsOf: east.vertices)
             normals.append(contentsOf: east.normals)
             uvList.append(contentsOf: east.uvList)
             elements.append(east.element)
 
             // MARK: North
+            let northVerticesCount = vertices.count
             progress?(0.3, 1)
             try Task.checkCancellation()
-            let north = try await createGeometryForWall(
+            let northData = try await createGeometryForWall(
                 xs: [Int](0..<Int(terrainImageSize.width)),
                 ys: [0],
                 normal: SCNVector3Make(0, 0, -1),
                 maxHeight: Float(maxZ + wallHeight - minZ),
-                vertexOffset: vertices.count,
-                terrainImageSize: imageSize,
-                terrainHeights: heights,
-                terrainSizeInMeters: sizeInMeters,
+                vertexOffset: northVerticesCount,
+                terrainImageSize: image.size,
+                terrainHeights: terrainHeights.heights,
+                terrainSizeInMeters: terrainSizeMeters,
                 metersPerPixelX: metersPerPixelX,
                 metersPerPixelY: metersPerPixelY
             )
 
-            await Task.yield()
+            let north = try await northData
             vertices.append(contentsOf: north.vertices)
             normals.append(contentsOf: north.normals)
             uvList.append(contentsOf: north.uvList)
             elements.append(north.element)
 
             // MARK: West
+            let westVerticesCount = vertices.count
             progress?(0.4, 1)
             try Task.checkCancellation()
-            let west = try await createGeometryForWall(
+            async let westData = createGeometryForWall(
                 xs: [0],
                 ys: [Int](0..<Int(terrainImageSize.height)),
                 normal: SCNVector3Make(1, 0, 0),
                 maxHeight: Float(maxZ + wallHeight - minZ),
-                vertexOffset: vertices.count,
-                terrainImageSize: imageSize,
-                terrainHeights: heights,
-                terrainSizeInMeters: sizeInMeters,
+                vertexOffset: westVerticesCount,
+                terrainImageSize: image.size,
+                terrainHeights: terrainHeights.heights,
+                terrainSizeInMeters: terrainSizeMeters,
                 metersPerPixelX: metersPerPixelX,
                 metersPerPixelY: metersPerPixelY
             )
             
-            await Task.yield()
+            let west = try await westData
             vertices.append(contentsOf: west.vertices)
             normals.append(contentsOf: west.normals)
             uvList.append(contentsOf: west.uvList)
@@ -453,11 +450,19 @@ open class TerrainNode: SCNNode {
         }
 
         // MARK: Top
+        let topVerticesCount = vertices.count
+        
         progress?(0.5, 1)
         try Task.checkCancellation()
-        let top = try await self.createTopGeometry(vertexOffset: vertices.count, enableShadows: shadows, imageSize: imageSize, heights: heights, sizeInMeters: sizeInMeters)
+        async let topData = self.createTopGeometry(
+            vertexOffset: topVerticesCount,
+            enableShadows: shadows,
+            imageSize: image.size,
+            heights: terrainHeights.heights,
+            sizeInMeters: terrainSizeMeters
+        )
 
-        await Task.yield()
+        let top = try await topData
         vertices.append(contentsOf: top.vertices)
         normals.append(contentsOf: top.normals)
         uvList.append(contentsOf: top.uvList)
@@ -465,11 +470,15 @@ open class TerrainNode: SCNNode {
 
         if wallHeight != nil {
             // MARK: Bottom
+            let bottomVerticesCount = vertices.count
             progress?(0.6, 1)
             try Task.checkCancellation()
-            let bottom = await createGeometryForBottom(vertexOffset: vertices.count, imageSize: imageSize)
+            let bottomData = await createGeometryForBottom(
+                vertexOffset: bottomVerticesCount,
+                imageSize: image.size
+            )
 	    
-            await Task.yield()
+            let bottom = bottomData
             vertices.append(contentsOf: bottom.vertices)
             normals.append(contentsOf: bottom.normals)
             uvList.append(contentsOf: bottom.uvList)

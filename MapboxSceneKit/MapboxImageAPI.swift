@@ -113,8 +113,6 @@ public final class MapboxImageAPI: NSObject {
         try await withThrowingTaskGroup(of: (Int, Int, UIImage).self) { group -> Void in
             for (xindex, x) in bounding.xs.enumerated() {
                 for (yindex, y) in bounding.ys.enumerated() {
-                    try Task.checkCancellation()
-                    
                     let index = bounding.ys.count * xindex + yindex
                     if index > maxConcurrentTaskCount {
                         if let (xindex, yindex, image) = try await group.next() {
@@ -126,14 +124,14 @@ public final class MapboxImageAPI: NSObject {
                     }
                     
                     group.addTask {
+                        try Task.checkCancellation()
+
                         return (xindex, yindex, try await self.httpAPI.tileset(tileset, zoomLevel: zoom, xTile: x, yTile: y, format: format))
                     }
                 }
             }
-            
+
             for try await (xindex, yindex, image) in group {
-                try Task.checkCancellation()
-                
                 completed += 1
                 print("image forTileset: \(tileset), progress: \(Float(completed)) / \(Float(total))")
                 progress?(Float(completed) / Float(total), total)
@@ -179,8 +177,6 @@ public final class MapboxImageAPI: NSObject {
         try await withThrowingTaskGroup(of: (Int, Int, UIImage).self) { group -> Void in
             for (xindex, x) in bounding.xs.enumerated() {
                 for (yindex, y) in bounding.ys.enumerated() {
-                    try Task.checkCancellation()
-                    
                     let index = bounding.ys.count * xindex + yindex
                     if index > maxConcurrentTaskCount {
                         if let (xindex, yindex, image) = try await group.next() {
@@ -192,14 +188,13 @@ public final class MapboxImageAPI: NSObject {
                     }
                     
                     group.addTask {
+                        try Task.checkCancellation()
                         return (xindex, yindex, try await self.httpAPI.style(style, zoomLevel: zoom, xTile: x, yTile: y, tileSize: returnedSize))
                     }
                 }
             }
-            
+
             for try await (xindex, yindex, image) in group {
-                try Task.checkCancellation()
-                
                 completed += 1
                 print("image forStyle: \(style), progress: \(Float(completed)) / \(Float(total))")
                 progress?(Float(completed) / Float(total), total)

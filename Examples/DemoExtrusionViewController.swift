@@ -137,14 +137,14 @@ class DemoExtrusionViewController: UIViewController {
             let textureFetchHandler = progressHandler.registerForProgress()
             
             fetchTask?.cancel()
-            fetchTask = Task {
-                await loadTerrain(
+            fetchTask = Task.detached {
+                await self.loadTerrain(
                     terrainNode: terrainNode,
                     terrainFetcherHandler: terrainFetcherHandler,
                     terrainRendererHandler: terrainRendererHandler
                 )
 
-                await loadTexture(
+                await self.loadTexture(
                     style: "mapbox/satellite-v9",
                     terrainNode: terrainNode,
                     textureFetchHandler: textureFetchHandler
